@@ -49,7 +49,7 @@ Tested with:
 
 - Vagrant 2.2.19
 
-- SLURM 20.11.4 (Ubuntu 21.04)
+- SLURM 22.05.8 (Debian 12.1)
 
 ---
 
