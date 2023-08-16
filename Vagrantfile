@@ -92,10 +92,10 @@ Vagrant.configure("2") do |global_config|
             config.vm.network :private_network, ip: options[:ipaddress]
 
             #VM specifications
-            config.vm.provider :virtualbox do |v|
+            config.vm.provider :libvirt do |v|
                 # v.customize ["modifyvm", :id, "--memory", "1024"]
-                v.cpus = 1
-                v.memory = 1024
+                v.cpus = 2
+                v.memory = 2048
             end
 
             #VM provisioning
