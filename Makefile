@@ -5,7 +5,8 @@ ALLSERVERSLIST:=controller ${NODESLIST}
 
 # Create Vagrant VMs with SLURM configured on them
 setup:
-	vagrant up
+	docker network create vagrant_network --subnet=10.10.10.0/24
+	vagrant up --provider=docker
 	rm -f munge.key id_*
 
 # make sure 'slurm' dir is writable for VMs
@@ -20,7 +21,7 @@ start:
 	vagrant ssh controller -- -t 'sudo -i systemctl start slurmctld; sleep 30' && \
 	vagrant ssh node1 -- -t 'sudo -i systemctl start slurmd; sleep 30' & \
 	vagrant ssh node2 -- -t 'sudo -i systemctl start slurmd; sleep 30' & \
-	wait &&
+	wait && \
 	vagrant ssh controller -- -t 'sudo scontrol update nodename=node[1-2] state=resume; sinfo; sleep 5'
 
 sinfo:

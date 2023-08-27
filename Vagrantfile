@@ -87,15 +87,24 @@ Vagrant.configure("2") do |global_config|
     slurm_cluster.each_pair do |name, options|
         global_config.vm.define name do |config|
             #VM configurations
-            config.vm.box = "debian/bookworm64"
+            config.vm.box = "debian/bookworm"
             config.vm.hostname = "#{name}"
-            config.vm.network :private_network, ip: options[:ipaddress]
+            config.vm.network :private_network, ip: options[:ipaddress], name: "vagrant_network"
 
             #VM specifications
             config.vm.provider :libvirt do |v|
                 # v.customize ["modifyvm", :id, "--memory", "1024"]
                 v.cpus = 2
                 v.memory = 2048
+            end
+
+            # Docker overrides
+            config.vm.provider "docker" do |docker, override|
+                override.vm.box = nil
+                docker.build_dir = "."
+                override.ssh.insert_key = true
+                docker.has_ssh = true
+                docker.privileged = true
             end
 
             #VM provisioning
