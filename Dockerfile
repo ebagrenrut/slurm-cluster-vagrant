@@ -16,5 +16,7 @@ RUN sed -i -e 's/Defaults.*requiretty/#&/' /etc/sudoers
 RUN sed -i -e 's/\(UsePAM \)yes/\1 no/' /etc/ssh/sshd_config
 RUN mkdir /var/run/sshd
 EXPOSE 22
+EXPOSE 6817
+EXPOSE 6818
 RUN /usr/sbin/sshd
 CMD ["/lib/systemd/systemd"]

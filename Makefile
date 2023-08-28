@@ -9,6 +9,10 @@ setup:
 	vagrant up --provider=docker
 	rm -f munge.key id_*
 
+# Just bring up the nodes
+up:
+	vagrant up --provider=docker
+
 # make sure 'slurm' dir is writable for VMs
 # start munge in VMs
 # start slurmctld, wait many seconds for it to fully start
@@ -16,8 +20,12 @@ setup:
 start:
 	find slurm -type d -exec chmod a+rwx {} \;
 	vagrant ssh controller -- -t 'sudo -i systemctl restart munge; sleep 1' && \
-	vagrant ssh node1 -- -t 'sudo -i systemctl restart munge; sleep 1' && \
-	vagrant ssh node2 -- -t 'sudo -i systemctl restart munge; sleep 1' && \
+	vagrant ssh node1 -- -t 'sudo -i systemctl start dbus; sleep 10' & \
+	vagrant ssh node2 -- -t 'sudo -i systemctl start dbus; sleep 10' & \
+	wait && \
+	vagrant ssh node1 -- -t 'sudo -i systemctl restart munge; sleep 2' & \
+	vagrant ssh node2 -- -t 'sudo -i systemctl restart munge; sleep 2' & \
+	wait && \
 	vagrant ssh controller -- -t 'sudo -i systemctl start slurmctld; sleep 30' && \
 	vagrant ssh node1 -- -t 'sudo -i systemctl start slurmd; sleep 30' & \
 	vagrant ssh node2 -- -t 'sudo -i systemctl start slurmd; sleep 30' & \

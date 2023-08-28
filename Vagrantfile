@@ -29,7 +29,7 @@ slurm_cluster = {
 $script = <<SCRIPT
 # install SLURM
 apt-get update
-apt-get install -y -q vim slurm-wlm
+apt-get install -y -q iputils-ping vim slurm-wlm
 
 # config SLURM
 ln -sf /vagrant/slurm.conf /etc/slurm/slurm.conf
@@ -87,24 +87,17 @@ Vagrant.configure("2") do |global_config|
     slurm_cluster.each_pair do |name, options|
         global_config.vm.define name do |config|
             #VM configurations
-            config.vm.box = "debian/bookworm"
+            config.vm.box = "debian/bookworm64"
             config.vm.hostname = "#{name}"
             config.vm.network :private_network, ip: options[:ipaddress], name: "vagrant_network"
 
-            #VM specifications
-            config.vm.provider :libvirt do |v|
-                # v.customize ["modifyvm", :id, "--memory", "1024"]
-                v.cpus = 2
-                v.memory = 2048
-            end
-
-            # Docker overrides
-            config.vm.provider "docker" do |docker, override|
+            config.vm.provider "docker" do |d,override|
                 override.vm.box = nil
-                docker.build_dir = "."
+                d.build_dir = "."
                 override.ssh.insert_key = true
-                docker.has_ssh = true
-                docker.privileged = true
+                d.has_ssh = true
+                d.privileged = true
+                d.create_args = ['--cpus=2', '--memory=8g']
             end
 
             #VM provisioning
